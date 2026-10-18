@@ -7,7 +7,7 @@
 <title>FPO media</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,400..800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Mona+Sans:wdth,wght@75..125,200..900&display=swap" rel="stylesheet">
 <style>
   :root {
     --paper: #F6F8F9;
@@ -39,9 +39,7 @@
     margin: 0;
     background: var(--paper);
     color: var(--ink);
-    font: 400 15px/1.5 "Archivo", system-ui, sans-serif;
-    font-variation-settings: "wdth" 100;
-    font-variant-numeric: tabular-nums;
+    font: 400 15px/1.5 "Mona Sans", system-ui, sans-serif;
   }
   .wrap { max-width: 1440px; margin: 0 auto; padding: 0 var(--gutter); }
   @media (min-width: 720px) { :root { --gutter: 32px; } }
@@ -68,13 +66,51 @@
     background: var(--paper);
     font-size: clamp(48px, 10vw, 76px);
     line-height: 1;
-    font-weight: 800;
-    font-variation-settings: "wdth" 125;
-    letter-spacing: -0.02em;
+    font-weight: 850;
+    font-stretch: 125%;
+    letter-spacing: -0.03em;
   }
   .intro { max-width: 52ch; color: var(--ink-soft); margin: 0; }
   .intro strong { color: var(--ink); font-weight: 600; }
   .intro a { color: inherit; text-underline-offset: 3px; }
+
+  /* Categories: thumbnail index, selected one framed in crop marks */
+  .cats {
+    display: flex; gap: 6px 4px;
+    overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none;
+    margin: 0 calc(-1 * var(--gutter));
+    padding: 8px var(--gutter) 20px;
+    scroll-padding-inline: var(--gutter);
+  }
+  .cats::-webkit-scrollbar { display: none; }
+  @media (min-width: 1100px) { .cats { flex-wrap: wrap; overflow: visible; } }
+  .cat {
+    all: unset;
+    position: relative;
+    flex: none;
+    display: flex; align-items: center; gap: 12px;
+    padding: 8px 16px 8px 8px;
+    cursor: pointer;
+    scroll-snap-align: start;
+  }
+  .cat .thumb {
+    position: relative; flex: none;
+    width: 48px; height: 48px;
+    background: var(--tile); overflow: hidden;
+  }
+  .cat .thumb img, .cat .thumb video, .cat .thumb svg {
+    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block;
+    filter: grayscale(1); opacity: .7; transition: filter .15s, opacity .15s;
+  }
+  .cat .thumb svg line { stroke: var(--guide); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+  .cat .thumb svg rect { fill: none; stroke: var(--guide); stroke-width: 3; vector-effect: non-scaling-stroke; }
+  .cat b { display: block; font-size: 16px; font-weight: 600; font-stretch: 108%; line-height: 1.25; }
+  .cat small { display: block; font-size: 14px; color: var(--ink-soft); line-height: 1.3; }
+  .cat .crop { inset: 0; }
+  .cat:hover .thumb > *, .cat[aria-pressed="true"] .thumb > * { filter: none; opacity: 1; }
+  .cat:hover .crop { opacity: .45; }
+  .cat[aria-pressed="true"] .crop { opacity: 1; }
+  .cat:focus-visible { outline: 2px solid var(--hit); outline-offset: 2px; }
 
   /* Controls */
   .controls {
@@ -86,7 +122,11 @@
   }
   .controls .wrap { display: flex; flex-wrap: wrap; gap: 10px 28px; padding-top: 12px; padding-bottom: 12px; }
   .group { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; min-width: 0; }
-  .group > span { color: var(--ink-soft); margin-right: 6px; font-size: 13px; }
+  .group > span { color: var(--ink-soft); margin-right: 6px; font-size: 14px; }
+  .ratio {
+    display: inline-block; margin-right: 7px; vertical-align: -1px;
+    border: 1.5px solid currentColor; border-radius: 1px; opacity: .8;
+  }
   .chip {
     font: inherit; font-size: 14px;
     color: var(--ink);
@@ -108,10 +148,10 @@
     margin: 0 0 16px;
     font-size: 20px;
     font-weight: 700;
-    font-variation-settings: "wdth" 112;
+    font-stretch: 112%;
     display: flex; align-items: baseline; gap: 10px;
   }
-  section h2 small { font-size: 14px; font-weight: 400; color: var(--ink-soft); font-variation-settings: "wdth" 100; }
+  section h2 small { font-size: 14px; font-weight: 400; color: var(--ink-soft); font-stretch: 100%; }
 
   .grid {
     display: grid;
@@ -148,7 +188,7 @@
   .tile:focus-visible .crop i { border-color: var(--hit); }
   .tile.copied .crop { opacity: 1; }
   .tile.copied .crop i { border-color: var(--hit); }
-  .cap { display: flex; justify-content: space-between; gap: 8px; margin-top: 7px; font-size: 13px; line-height: 1.3; }
+  .cap { display: flex; justify-content: space-between; gap: 8px; margin-top: 7px; font-size: 14px; line-height: 1.3; }
   .cap b { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .cap span { color: var(--ink-soft); white-space: nowrap; }
 
@@ -171,7 +211,7 @@
   .empty, .error { color: var(--ink-soft); margin-top: 48px; }
 
   @media (prefers-reduced-motion: reduce) {
-    .crop, .toast { transition: none; }
+    .crop, .toast, .cat .thumb > * { transition: none; }
   }
 </style>
 </head>
@@ -191,9 +231,12 @@
   </p>
 </header>
 
+<nav class="wrap" aria-label="Categories">
+  <div class="cats" id="cats"></div>
+</nav>
+
 <div class="controls" role="toolbar" aria-label="Filters">
   <div class="wrap">
-    <div class="group" id="cats"><span>Show</span></div>
     <div class="group" id="shapes"><span>Shape</span></div>
     <div class="group" id="formats"><span>Copy as</span></div>
   </div>
@@ -226,10 +269,40 @@
   const $ = id => document.getElementById(id);
   let manifest, base;
 
-  function chips(el, list, key) {
+  // Outline drawn at each shape's real proportions
+  const RATIO = { cinema: [21, 10], landscape: [15, 10], portrait: [9, 12], square: [11, 11] };
+  const CROP = `<span class="crop" aria-hidden="true"><i></i><i></i><i></i><i></i></span>`;
+
+  function fillShape(b, value, text) {
+    b.className = "chip";
+    const r = RATIO[value];
+    b.innerHTML = (r ? `<i class="ratio" aria-hidden="true" style="width:${r[0]}px;height:${r[1]}px"></i>` : "") + text;
+  }
+
+  function fillCat(b, value, text) {
+    b.className = "cat";
+    const count = list => Object.values(list).reduce((n, items) => n + items.length, 0);
+    const images = Object.values(manifest.images).reduce((n, c) => n + count(c), 0);
+    const clips = count(manifest.videos);
+    let thumb, meta;
+    if (value === "all") {
+      thumb = `<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><rect x="0" y="0" width="100" height="100"/><line x1="0" y1="0" x2="100" y2="100"/><line x1="100" y1="0" x2="0" y2="100"/></svg>`;
+      meta = `${images + clips} files`;
+    } else if (value === "vids") {
+      thumb = `<video src="vids/square/vid-2.mp4#t=1" muted playsinline preload="metadata" aria-hidden="true"></video>`;
+      meta = `${clips} clips`;
+    } else {
+      thumb = `<img src="${value}/square/1.webp" alt="" width="48" height="48" decoding="async">`;
+      meta = `${count(manifest.images[value])} images`;
+    }
+    b.innerHTML = `<span class="thumb">${thumb}</span><span><b>${text}</b><small>${meta}</small></span>${CROP}`;
+  }
+
+  function chips(el, list, key, fill) {
     for (const [value, text] of list) {
       const b = document.createElement("button");
-      b.type = "button"; b.className = "chip"; b.textContent = text; b.dataset.value = value;
+      b.type = "button"; b.dataset.value = value;
+      if (fill) fill(b, value, text); else { b.className = "chip"; b.textContent = text; }
       b.addEventListener("click", () => {
         state[key] = value;
         if (key === "format") { try { localStorage.setItem("fpo-media", JSON.stringify({ format: value })); } catch (e) {} }
@@ -249,7 +322,7 @@
   function sync() {
     const available = shapesFor(state.cat);
     if (state.shape !== "all" && !available.includes(state.shape)) state.shape = "all";
-    for (const b of document.querySelectorAll("#cats .chip")) b.setAttribute("aria-pressed", b.dataset.value === state.cat);
+    for (const b of document.querySelectorAll("#cats .cat")) b.setAttribute("aria-pressed", b.dataset.value === state.cat);
     for (const b of document.querySelectorAll("#shapes .chip")) {
       b.setAttribute("aria-pressed", b.dataset.value === state.shape);
       b.disabled = b.dataset.value !== "all" && !available.includes(b.dataset.value);
@@ -345,13 +418,12 @@
     }
   }
 
-  chips($("cats"), CATS, "cat");
-  chips($("shapes"), SHAPES, "shape");
+  chips($("shapes"), SHAPES, "shape", fillShape);
   chips($("formats"), FORMATS, "format");
 
   fetch("manifest.json")
     .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
-    .then(m => { manifest = m; base = m.base; sync(); render(); })
+    .then(m => { manifest = m; base = m.base; chips($("cats"), CATS, "cat", fillCat); sync(); render(); })
     .catch(() => {
       $("out").innerHTML = `<p class="error">Couldn't load manifest.json. Open this page from GitHub Pages or a local server, not straight from the file.</p>`;
     });
