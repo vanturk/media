@@ -4,6 +4,7 @@ Placeholder (FPO) images and videos for CodePen and HTML prototypes, served from
 
 - **Gallery:** https://vanturk.github.io/media/ (click any file to copy its URL, an HTML tag or a CSS background)
 - **File list:** https://vanturk.github.io/media/manifest.json
+- **Starter stylesheet:** https://vanturk.github.io/media/reset.css
 
 ## What's in here
 
@@ -15,7 +16,10 @@ media/
 ├── oversize/         cinema · landscape · portrait · square   (0–13.webp each)
 ├── male/             landscape · portrait · square            (0–10.webp each)
 ├── female/           landscape · portrait · square            (0–10.webp each)
-└── vids/             landscape · portrait · square            (vid-1 … vid-10.mp4 each)
+├── pokemon/          square                                   (1–24.webp)
+├── vids/             landscape · portrait · square            (vid-1 … vid-10.mp4 each)
+├── reset.css
+└── manifest.json
 ```
 
 | Shape | Images | Videos |
@@ -23,9 +27,9 @@ media/
 | cinema | 2000×960 | |
 | landscape | 2000×1350 (male, female: 800×540) | 1280×720 |
 | portrait | 800×1080 | 720×1280 |
-| square | 800×800 | 720×720 |
+| square | 800×800 (pokemon: 475×475) | 720×720 |
 
-- **Images:** WebP, quality 80. A couple of cinema images are a few pixels off (2025×960, 2000×959); `manifest.json` has the exact size of every file.
+- **Images:** WebP, quality 80. `0.webp` in each folder is a grey placeholder graphic; Pokémon images have transparent backgrounds. A couple of cinema images are a few pixels off (2025×960, 2000×959); `manifest.json` has the exact size of every file.
 - **Videos:** MP4 (H.264), each under 3 MB, set to start playing before the whole file downloads. The same `vid-N` is the same clip in all three shapes. Clips 3, 6 and 8 have no sound; the rest do.
 - **Total size:** about 70 MB.
 
@@ -50,6 +54,12 @@ https://vanturk.github.io/media/vids/<shape>/vid-<n>.mp4
        src="https://vanturk.github.io/media/vids/portrait/vid-6.mp4"></video>
 ```
 
+**Starter stylesheet**
+
+```html
+<link rel="stylesheet" href="https://vanturk.github.io/media/reset.css">
+```
+
 **CSS background**
 
 ```css
@@ -70,12 +80,13 @@ All of these work as they are in CodePen, JSFiddle or a local HTML file.
 ## Adding or changing files
 
 1. Settle file sizes **before** committing. Git keeps every version of every file, so replacing a file later still leaves the old copy in the repo's size.
-2. Keep videos under 3 MB and in the same `vid-N` numbering across all three shapes.
-3. Rebuild the file list (needs `ffprobe`, from `brew install ffmpeg`):
+2. Image folders follow `<category>/<shape>/<n>.webp`, with shape one of `cinema`, `landscape`, `portrait` or `square`. A new category folder shows up in the gallery automatically once the manifest is rebuilt.
+3. Keep videos under 3 MB and in the same `vid-N` numbering across all three shapes.
+4. Rebuild the file list (needs `ffprobe`, from `brew install ffmpeg`):
    ```bash
    bash scripts/build-manifest.sh
    ```
-4. Commit and push. Pages updates within a minute or two.
+5. Commit and push. Pages updates within a minute or two.
 
 Use plain Git, not Git LFS. GitHub Pages doesn't serve LFS files.
 

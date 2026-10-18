@@ -5,12 +5,22 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 BASE="https://vanturk.github.io/media/"
+
+# Image categories: any folder holding <shape>/*.webp. Listed in this order first, new ones after.
+ORDER="dessert fruit interior-design oversize male female"
+CATS=()
+for c in $ORDER; do [ -d "$c" ] && CATS+=("$c"); done
+for d in */; do
+  c="${d%/}"
+  case " $ORDER vids scripts " in *" $c "*) continue ;; esac
+  compgen -G "$c/*/*.webp" > /dev/null && CATS+=("$c")
+done
 {
   echo "{"
   echo "  \"base\": \"$BASE\","
   echo "  \"images\": {"
   firstc=1
-  for c in dessert fruit interior-design oversize male female; do
+  for c in "${CATS[@]}"; do
     [ $firstc = 1 ] || echo ","; firstc=0
     printf '    "%s": {\n' "$c"
     firsts=1

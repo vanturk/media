@@ -73,6 +73,11 @@
   .intro { max-width: 52ch; color: var(--ink-soft); margin: 0; }
   .intro strong { color: var(--ink); font-weight: 600; }
   .intro a { color: inherit; text-underline-offset: 3px; }
+  .about { display: grid; gap: 14px; }
+  .kit { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font-size: 14px; color: var(--ink-soft); }
+  .kit a { color: var(--ink); font-weight: 600; text-underline-offset: 3px; }
+  .kit .chip { border-color: var(--crop); }
+  .kit .chip:hover { border-color: var(--ink); }
 
   /* Categories: thumbnail index, selected one framed in crop marks */
   .cats {
@@ -83,19 +88,18 @@
     scroll-padding-inline: var(--gutter);
   }
   .cats::-webkit-scrollbar { display: none; }
-  @media (min-width: 1100px) { .cats { flex-wrap: wrap; overflow: visible; } }
   .cat {
     all: unset;
     position: relative;
     flex: none;
-    display: flex; align-items: center; gap: 12px;
-    padding: 8px 16px 8px 8px;
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 12px 8px 8px;
     cursor: pointer;
     scroll-snap-align: start;
   }
   .cat .thumb {
     position: relative; flex: none;
-    width: 48px; height: 48px;
+    width: 44px; height: 44px;
     background: var(--tile); overflow: hidden;
   }
   .cat .thumb img, .cat .thumb video, .cat .thumb svg {
@@ -224,11 +228,18 @@
     </svg>
     <h1>media</h1>
   </div>
-  <p class="intro">
-    Placeholder images and video for prototypes. <strong>Click any file to copy it</strong>
-    as a URL, an HTML tag or a CSS background. Everything is also listed in
-    <a href="manifest.json">manifest.json</a>.
-  </p>
+  <div class="about">
+    <p class="intro">
+      Placeholder images and video for prototypes. <strong>Click any file to copy it</strong>
+      as a URL, an HTML tag or a CSS background. Everything is also listed in
+      <a href="manifest.json">manifest.json</a>.
+    </p>
+    <p class="kit">
+      <span>Starter stylesheet for new pens:</span>
+      <a href="reset.css">reset.css</a>
+      <button type="button" class="chip" id="copy-reset">Copy link tag</button>
+    </p>
+  </div>
 </header>
 
 <nav class="wrap" aria-label="Categories">
@@ -248,14 +259,12 @@
 
 <script>
 (() => {
-  const CATS = [
-    ["all", "Everything"], ["dessert", "Dessert"], ["fruit", "Fruit"],
-    ["interior-design", "Interior design"], ["oversize", "Oversize"],
-    ["male", "Male"], ["female", "Female"], ["vids", "Video"]
-  ];
+  // Categories come from manifest.json; these only fix up display names
+  const LABELS = { all: "Everything", "interior-design": "Interior design", pokemon: "Pokémon", vids: "Video" };
+  const label = key => LABELS[key] || key.charAt(0).toUpperCase() + key.slice(1).replace(/-/g, " ");
+  let CATS = [];
   const SHAPES = [["all", "All"], ["cinema", "Cinema"], ["landscape", "Landscape"], ["portrait", "Portrait"], ["square", "Square"]];
   const FORMATS = [["url", "URL"], ["html", "HTML"], ["css", "CSS"]];
-  const LABEL = Object.fromEntries(CATS);
 
   const state = { cat: "all", shape: "all", format: "url" };
   try {
@@ -263,7 +272,6 @@
     if (FORMATS.some(f => f[0] === saved.format)) state.format = saved.format;
   } catch (e) {}
   const fromHash = new URLSearchParams(location.hash.slice(1));
-  if (CATS.some(c => c[0] === fromHash.get("show"))) state.cat = fromHash.get("show");
   if (SHAPES.some(s => s[0] === fromHash.get("shape"))) state.shape = fromHash.get("shape");
 
   const $ = id => document.getElementById(id);
@@ -292,7 +300,10 @@
       thumb = `<video src="vids/square/vid-2.mp4#t=1" muted playsinline preload="metadata" aria-hidden="true"></video>`;
       meta = `${clips} clips`;
     } else {
-      thumb = `<img src="${value}/square/1.webp" alt="" width="48" height="48" decoding="async">`;
+      const shapes = manifest.images[value];
+      const list = shapes.square || Object.values(shapes)[0];
+      const pick = list.find(i => !/\/0\.webp$/.test(i.src)) || list[0];   // skip the grey 0.webp placeholder
+      thumb = `<img src="${pick.src}" alt="" width="44" height="44" decoding="async">`;
       meta = `${count(manifest.images[value])} images`;
     }
     b.innerHTML = `<span class="thumb">${thumb}</span><span><b>${text}</b><small>${meta}</small></span>${CROP}`;
@@ -375,7 +386,7 @@
   function tile(item, video) {
     const b = document.createElement("button");
     b.type = "button"; b.className = "tile";
-    const name = item.src.replace(/^vids\//, "");
+    const name = item.src.split("/").pop();
     const meta = video ? `${item.duration}s${item.audio ? ", sound" : ""}` : `${item.width}×${item.height}`;
     b.setAttribute("aria-label", `Copy ${item.src}`);
     b.innerHTML = `<div class="frame" style="--ar:${item.width}/${item.height}"><div class="crop"><i></i><i></i><i></i><i></i></div></div>
@@ -409,7 +420,7 @@
     if (!gs.length) { out.innerHTML = `<p class="empty">Nothing in that shape. Pick another shape or show everything.</p>`; return; }
     for (const g of gs) {
       const s = document.createElement("section");
-      const title = `${LABEL[g.cat]}, ${g.shape}`;
+      const title = `${label(g.cat)}, ${g.shape}`;
       s.innerHTML = `<h2>${title} <small>${g.items.length} ${g.video ? "clips" : "images"}</small></h2>`;
       const grid = document.createElement("div");
       grid.className = "grid"; grid.dataset.shape = g.shape;
@@ -419,11 +430,22 @@
   }
 
   chips($("shapes"), SHAPES, "shape", fillShape);
+  $("copy-reset").addEventListener("click", async () => {
+    const ok = await copy(`<link rel="stylesheet" href="${base || "https://vanturk.github.io/media/"}reset.css">`);
+    toast(ok ? "Copied the <b>reset.css</b> link tag" : "Couldn't copy. Your browser blocked clipboard access.");
+  });
   chips($("formats"), FORMATS, "format");
 
   fetch("manifest.json")
     .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
-    .then(m => { manifest = m; base = m.base; chips($("cats"), CATS, "cat", fillCat); sync(); render(); })
+    .then(m => {
+      manifest = m; base = m.base;
+      CATS = ["all", ...Object.keys(m.images), "vids"].map(k => [k, label(k)]);
+      if (CATS.some(c => c[0] === fromHash.get("show"))) state.cat = fromHash.get("show");
+      chips($("cats"), CATS, "cat", fillCat); sync(); render();
+      const row = $("cats"), active = row.querySelector('[aria-pressed="true"]');
+      if (active && active.offsetLeft + active.offsetWidth > row.clientWidth) row.scrollLeft = active.offsetLeft - 16;
+    })
     .catch(() => {
       $("out").innerHTML = `<p class="error">Couldn't load manifest.json. Open this page from GitHub Pages or a local server, not straight from the file.</p>`;
     });

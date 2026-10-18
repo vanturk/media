@@ -378,6 +378,34 @@
         {"src": "female/square/9.webp", "width": 800, "height": 800},
         {"src": "female/square/10.webp", "width": 800, "height": 800}
       ]
+    },
+    "pokemon": {
+      "square": [
+        {"src": "pokemon/square/1.webp", "width": 475, "height": 475},
+        {"src": "pokemon/square/2.webp", "width": 475, "height": 475},
+        {"src": "pokemon/square/3.webp", "width": 475, "height": 475},
+        {"src": "pokemon/square/4.webp", "width": 475, "height": 475},
+        {"src": "pokemon/square/5.webp", "width": 475, "height": 475},
+        {"src": "pokemon/square/6.webp", "width": 475, "height": 475},
+        {"src": "pokemon/square/7.webp", "width": 475, "height": 475},
+        {"src": "pokemon/square/8.webp", "width": 475, "height": 475},
+        {"src": "pokemon/square/9.webp", "width": 475, "height": 475},
+        {"src": "pokemon/square/10.webp", "width": 475, "height": 475},
+        {"src": "pokemon/square/11.webp", "width": 475, "height": 475},
+        {"src": "pokemon/square/12.webp", "width": 475, "height": 475},
+        {"src": "pokemon/square/13.webp", "width": 475, "height": 475},
+        {"src": "pokemon/square/14.webp", "width": 475, "height": 475},
+        {"src": "pokemon/square/15.webp", "width": 475, "height": 475},
+        {"src": "pokemon/square/16.webp", "width": 475, "height": 475},
+        {"src": "pokemon/square/17.webp", "width": 475, "height": 475},
+        {"src": "pokemon/square/18.webp", "width": 475, "height": 475},
+        {"src": "pokemon/square/19.webp", "width": 475, "height": 475},
+        {"src": "pokemon/square/20.webp", "width": 475, "height": 475},
+        {"src": "pokemon/square/21.webp", "width": 475, "height": 475},
+        {"src": "pokemon/square/22.webp", "width": 475, "height": 475},
+        {"src": "pokemon/square/23.webp", "width": 475, "height": 475},
+        {"src": "pokemon/square/24.webp", "width": 475, "height": 475}
+      ]
     }
   },
   "videos": {
