@@ -12,7 +12,7 @@ CATS=()
 for c in $ORDER; do [ -d "$c" ] && CATS+=("$c"); done
 for d in */; do
   c="${d%/}"
-  case " $ORDER vids scripts " in *" $c "*) continue ;; esac
+  case " $ORDER vids svg scripts " in *" $c "*) continue ;; esac
   compgen -G "$c/*/*.webp" > /dev/null && CATS+=("$c")
 done
 {
@@ -55,6 +55,25 @@ done
       [ $firstf = 1 ] || printf ','; firstf=0
       printf '\n      {"src": "%s", "width": %s, "height": %s, "duration": %.1f, "audio": %s, "bytes": %s}' \
         "$p" "${wh%,*}" "${wh#*,}" "$d" "$([ -n "$a" ] && echo true || echo false)" "$(stat -f%z "$p")"
+    done
+    printf '\n    ]'
+  done
+  echo ""
+  echo "  },"
+  # SVGs: one list per folder under svg/, sizes read from the root <svg> tag
+  echo "  \"svgs\": {"
+  firstd=1
+  for d in $(find svg -type f -name '*.svg' -exec dirname {} \; | sort -u); do
+    [ $firstd = 1 ] || echo ","; firstd=0
+    printf '    "%s": [' "$d"
+    firstf=1
+    for f in $(ls "$d" | grep '\.svg$' | sort -n); do
+      p="$d/$f"
+      tag=$(head -c 2000 "$p" | tr '\n' ' ' | grep -o '<svg[^>]*>' | head -1)
+      w=$(echo "$tag" | sed -n 's/.* width="\([0-9.]*\)".*/\1/p')
+      h=$(echo "$tag" | sed -n 's/.* height="\([0-9.]*\)".*/\1/p')
+      [ $firstf = 1 ] || printf ','; firstf=0
+      printf '\n      {"src": "%s", "width": %s, "height": %s}' "$p" "$w" "$h"
     done
     printf '\n    ]'
   done

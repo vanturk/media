@@ -17,6 +17,7 @@
     --crop: #9AA7B2;
     --hit: #D4006F;        /* copy confirmation */
     --tile: #E7ECEF;
+    --sheet: #FFFFFF;      /* behind SVGs, light in both themes */
     --gutter: 16px;
     color-scheme: light;
   }
@@ -29,6 +30,7 @@
       --crop: #5F6E7B;
       --hit: #FF4FA3;
       --tile: #1C232B;
+      --sheet: #E9EEF2;
       color-scheme: dark;
     }
   }
@@ -106,6 +108,7 @@
     position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block;
     filter: grayscale(1); opacity: .7; transition: filter .15s, opacity .15s;
   }
+  .cat .thumb img.art { object-fit: contain; padding: 6px; background: var(--sheet); }
   .cat .thumb svg line { stroke: var(--guide); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
   .cat .thumb svg rect { fill: none; stroke: var(--guide); stroke-width: 3; vector-effect: non-scaling-stroke; }
   .cat b { display: block; font-size: 16px; font-weight: 600; font-stretch: 108%; line-height: 1.25; }
@@ -166,6 +169,7 @@
   .grid[data-shape="landscape"] { --min: 220px; }
   .grid[data-shape="portrait"]  { --min: 140px; }
   .grid[data-shape="square"]    { --min: 150px; }
+  .grid[data-shape="svg"]       { --min: 150px; }
   @media (max-width: 480px) {
     .grid[data-shape="cinema"], .grid[data-shape="landscape"] { --min: 100%; }
     .grid[data-shape="portrait"], .grid[data-shape="square"] { --min: 130px; }
@@ -181,6 +185,8 @@
   }
   .frame { position: relative; background: var(--tile); aspect-ratio: var(--ar); }
   .frame img, .frame video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+  .frame.art { background: var(--sheet); }
+  .frame.art img { object-fit: contain; padding: 14%; }
   .crop { position: absolute; inset: -7px; pointer-events: none; opacity: 0; transition: opacity .15s; }
   .crop i { position: absolute; width: 10px; height: 10px; border: 0 solid var(--ink); }
   .crop i:nth-child(1) { top: 0; left: 0; border-top-width: 1px; border-left-width: 1px; }
@@ -230,8 +236,8 @@
   </div>
   <div class="about">
     <p class="intro">
-      Placeholder images and video for prototypes. <strong>Click any file to copy it</strong>
-      as a URL, an HTML tag or a CSS background. Everything is also listed in
+      Placeholder images, video and SVGs for prototypes. <strong>Click any file to copy it</strong>
+      as a URL, an HTML tag, a CSS background or, for SVGs, the markup itself. Everything is also listed in
       <a href="manifest.json">manifest.json</a>.
     </p>
     <p class="kit">
@@ -260,11 +266,11 @@
 <script>
 (() => {
   // Categories come from manifest.json; these only fix up display names
-  const LABELS = { all: "Everything", "interior-design": "Interior design", pokemon: "Pokémon", vids: "Video" };
+  const LABELS = { all: "Everything", "interior-design": "Interior design", pokemon: "Pokémon", vids: "Video", svg: "SVG" };
   const label = key => LABELS[key] || key.charAt(0).toUpperCase() + key.slice(1).replace(/-/g, " ");
   let CATS = [];
   const SHAPES = [["all", "All"], ["cinema", "Cinema"], ["landscape", "Landscape"], ["portrait", "Portrait"], ["square", "Square"]];
-  const FORMATS = [["url", "URL"], ["html", "HTML"], ["css", "CSS"]];
+  const FORMATS = [["url", "URL"], ["html", "HTML"], ["css", "CSS"], ["svg", "Inline SVG"]];
 
   const state = { cat: "all", shape: "all", format: "url" };
   try {
@@ -292,13 +298,18 @@
     const count = list => Object.values(list).reduce((n, items) => n + items.length, 0);
     const images = Object.values(manifest.images).reduce((n, c) => n + count(c), 0);
     const clips = count(manifest.videos);
+    const svgs = count(manifest.svgs || {});
     let thumb, meta;
     if (value === "all") {
       thumb = `<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><rect x="0" y="0" width="100" height="100"/><line x1="0" y1="0" x2="100" y2="100"/><line x1="100" y1="0" x2="0" y2="100"/></svg>`;
-      meta = `${images + clips} files`;
+      meta = `${images + clips + svgs} files`;
     } else if (value === "vids") {
       thumb = `<video src="vids/square/vid-2.mp4#t=1" muted playsinline preload="metadata" aria-hidden="true"></video>`;
       meta = `${clips} clips`;
+    } else if (value === "svg") {
+      const list = manifest.svgs["svg/shapes/starburst"] || Object.values(manifest.svgs)[0];
+      thumb = `<img class="art" src="${list[0].src}" alt="" width="44" height="44" decoding="async">`;
+      meta = `${svgs} SVGs`;
     } else {
       const shapes = manifest.images[value];
       const list = shapes.square || Object.values(shapes)[0];
@@ -326,6 +337,7 @@
 
   function shapesFor(cat) {
     if (cat === "vids") return Object.keys(manifest.videos);
+    if (cat === "svg") return [];
     if (cat === "all") return SHAPES.slice(1).map(s => s[0]);
     return Object.keys(manifest.images[cat]);
   }
@@ -345,31 +357,61 @@
     const cats = state.cat === "all" ? CATS.slice(1).map(c => c[0]) : [state.cat];
     const out = [];
     for (const cat of cats) {
+      if (cat === "svg") {
+        // One section per folder; SVGs have no shape, so they only show under "All"
+        if (state.shape !== "all") continue;
+        const folders = Object.keys(manifest.svgs).sort((a, b) => (a === "svg") - (b === "svg"));   // loose files last
+        for (const folder of folders) out.push({ cat, folder, shape: "svg", items: manifest.svgs[folder], kind: "svg" });
+        continue;
+      }
       const shapes = cat === "vids" ? manifest.videos : manifest.images[cat];
       for (const shape of Object.keys(shapes)) {
         if (state.shape !== "all" && shape !== state.shape) continue;
-        out.push({ cat, shape, items: shapes[shape], video: cat === "vids" });
+        out.push({ cat, shape, items: shapes[shape], kind: cat === "vids" ? "video" : "image" });
       }
     }
     return out;
   }
 
-  function snippet(item, video) {
+  // "svg/arrows/set-1" -> "Arrows, set 1"; loose files in svg/ -> "SVG, other"
+  function folderLabel(folder) {
+    const parts = folder.split("/").slice(1);
+    if (!parts.length) return "SVG, other";
+    return [label(parts[0]), ...parts.slice(1).map(p => p.replace(/-/g, " "))].join(", ");
+  }
+
+  // Inline markup is fetched on click and handed to the clipboard as a promise (Safari needs the write inside the click)
+  const markup = {};
+  const svgText = src => markup[src] || (markup[src] = fetch(src).then(r => { if (!r.ok) throw new Error(r.status); return r.text(); }).then(t => t.trim()));
+
+  function snippet(item, kind) {
     const url = base + item.src;
+    const video = kind === "video";
+    if (state.format === "svg") return kind === "svg" ? svgText(item.src) : url;
     if (state.format === "html") {
       return video
         ? `<video src="${url}" autoplay muted loop playsinline width="${item.width}" height="${item.height}"></video>`
         : `<img src="${url}" alt="" width="${item.width}" height="${item.height}">`;
     }
     if (state.format === "css") {
+      if (kind === "svg") return `background: url("${url}") center / contain no-repeat;`;
       return video ? url : `background: url("${url}") center / cover;`;
     }
     return url;
   }
 
   async function copy(text) {
-    try { await navigator.clipboard.writeText(text); return true; }
+    try {
+      if (typeof text !== "string") {
+        try {
+          await navigator.clipboard.write([new ClipboardItem({ "text/plain": text.then(t => new Blob([t], { type: "text/plain" })) })]);
+          return true;
+        } catch (e) { text = await text; }
+      }
+      await navigator.clipboard.writeText(text); return true;
+    }
     catch (e) {
+      if (typeof text !== "string") return false;
       const t = document.createElement("textarea");
       t.value = text; t.setAttribute("readonly", ""); t.style.position = "fixed"; t.style.opacity = "0";
       document.body.appendChild(t); t.select();
@@ -383,13 +425,15 @@
     clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove("show"), 1800);
   }
 
-  function tile(item, video) {
+  function tile(item, kind) {
+    const video = kind === "video";
     const b = document.createElement("button");
     b.type = "button"; b.className = "tile";
     const name = item.src.split("/").pop();
     const meta = video ? `${item.duration}s${item.audio ? ", sound" : ""}` : `${item.width}×${item.height}`;
     b.setAttribute("aria-label", `Copy ${item.src}`);
-    b.innerHTML = `<div class="frame" style="--ar:${item.width}/${item.height}"><div class="crop"><i></i><i></i><i></i><i></i></div></div>
+    const ar = kind === "svg" ? "1/1" : `${item.width}/${item.height}`;
+    b.innerHTML = `<div class="frame${kind === "svg" ? " art" : ""}" style="--ar:${ar}"><div class="crop"><i></i><i></i><i></i><i></i></div></div>
       <div class="cap"><b>${name}</b><span>${meta}</span></div>`;
     const frame = b.firstElementChild;
     if (video) {
@@ -405,10 +449,11 @@
       frame.prepend(img);
     }
     b.addEventListener("click", async () => {
-      const text = snippet(item, video);
-      const ok = await copy(text);
-      const fell = video && state.format === "css";
-      toast(ok ? `Copied <b>${item.src}</b> as ${fell ? "a URL (videos have no CSS form)" : FORMATS.find(f => f[0] === state.format)[1]}` : "Couldn't copy. Your browser blocked clipboard access.");
+      const ok = await copy(snippet(item, kind));
+      let as = FORMATS.find(f => f[0] === state.format)[1];
+      if (video && state.format === "css") as = "a URL (videos have no CSS form)";
+      if (kind !== "svg" && state.format === "svg") as = "a URL (only SVGs have inline markup)";
+      toast(ok ? `Copied <b>${item.src}</b> as ${as}` : "Couldn't copy. Your browser blocked clipboard access.");
       b.classList.add("copied"); setTimeout(() => b.classList.remove("copied"), 900);
     });
     return b;
@@ -420,11 +465,12 @@
     if (!gs.length) { out.innerHTML = `<p class="empty">Nothing in that shape. Pick another shape or show everything.</p>`; return; }
     for (const g of gs) {
       const s = document.createElement("section");
-      const title = `${label(g.cat)}, ${g.shape}`;
-      s.innerHTML = `<h2>${title} <small>${g.items.length} ${g.video ? "clips" : "images"}</small></h2>`;
+      const title = g.kind === "svg" ? folderLabel(g.folder) : `${label(g.cat)}, ${g.shape}`;
+      const noun = { video: "clips", image: "images", svg: "SVGs" }[g.kind];
+      s.innerHTML = `<h2>${title} <small>${g.items.length} ${noun}</small></h2>`;
       const grid = document.createElement("div");
       grid.className = "grid"; grid.dataset.shape = g.shape;
-      for (const item of g.items) grid.appendChild(tile(item, g.video));
+      for (const item of g.items) grid.appendChild(tile(item, g.kind));
       s.appendChild(grid); out.appendChild(s);
     }
   }
@@ -440,7 +486,7 @@
     .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
     .then(m => {
       manifest = m; base = m.base;
-      CATS = ["all", ...Object.keys(m.images), "vids"].map(k => [k, label(k)]);
+      CATS = ["all", ...Object.keys(m.images), "vids", ...(m.svgs ? ["svg"] : [])].map(k => [k, label(k)]);
       if (CATS.some(c => c[0] === fromHash.get("show"))) state.cat = fromHash.get("show");
       chips($("cats"), CATS, "cat", fillCat); sync(); render();
       const row = $("cats"), active = row.querySelector('[aria-pressed="true"]');
