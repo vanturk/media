@@ -237,7 +237,7 @@
     <p class="kit">
       <span>Starter stylesheet for new pens:</span>
       <a href="reset.css">reset.css</a>
-      <button type="button" class="chip" id="copy-reset">Copy link tag</button>
+      <button type="button" class="chip" id="copy-reset">Copy URL</button>
     </p>
   </div>
 </header>
@@ -431,8 +431,8 @@
 
   chips($("shapes"), SHAPES, "shape", fillShape);
   $("copy-reset").addEventListener("click", async () => {
-    const ok = await copy(`<link rel="stylesheet" href="${base || "https://vanturk.github.io/media/"}reset.css">`);
-    toast(ok ? "Copied the <b>reset.css</b> link tag" : "Couldn't copy. Your browser blocked clipboard access.");
+    const ok = await copy(`${base || "https://vanturk.github.io/media/"}reset.css`);
+    toast(ok ? "Copied the <b>reset.css</b> URL" : "Couldn't copy. Your browser blocked clipboard access.");
   });
   chips($("formats"), FORMATS, "format");
 
