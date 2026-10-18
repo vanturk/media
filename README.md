@@ -21,6 +21,7 @@ media/
 ├── buildings/        cinema · landscape · portrait · square   (1–17.webp each)
 ├── friends/          cinema · landscape · portrait · square   (1–8.webp each)
 ├── pasta/            cinema · landscape · portrait · square   (1–12.webp each)
+├── veggies/          cinema · landscape · portrait · square   (1–28.webp each)
 ├── pokemon/          square                                   (1–24.webp)
 ├── vids/             landscape · portrait · square            (vid-1 … vid-10.mp4 each)
 ├── reset.css
@@ -29,15 +30,15 @@ media/
 
 | Shape | Images | Videos |
 |---|---|---|
-| cinema | 2000×960 (baking, bread, buildings, friends, pasta: 1200×576) | |
-| landscape | 2000×1350 (male, female: 800×540; baking, bread, buildings, friends, pasta: 1200×800) | 1280×720 |
-| portrait | 800×1080 (baking, bread, buildings, friends: 800×1200) | 720×1280 |
-| square | 800×800 (baking, bread, buildings, friends, pasta: 1000×1000; pokemon: 475×475) | 720×720 |
+| cinema | 2000×960 (baking, bread, buildings, friends, pasta, veggies: 1200×576) | |
+| landscape | 2000×1350 (male, female: 800×540; baking, bread, buildings, friends, pasta: 1200×800; veggies: 1200×900) | 1280×720 |
+| portrait | 800×1080 (baking, bread, buildings, friends: 800×1200; veggies: 900×1200) | 720×1280 |
+| square | 800×800 (baking, bread, buildings, friends, pasta, veggies: 1000×1000; pokemon: 475×475) | 720×720 |
 
-- **Images:** WebP, quality 80. In the folders numbered from 0, `0.webp` is a grey placeholder graphic; baking, bread, buildings, friends and pasta start at `1.webp`. Pokémon images have transparent backgrounds. A few images are off their shape's usual size (cinema 2025×960 and 2000×959, three baking landscapes at 1200×801, one friends square at 1500×1500); `manifest.json` has the exact size of every file.
-- **Smaller cinema crops:** the cinema images in baking, bread, buildings, friends and pasta are center crops of their landscape images, kept at 1200 wide rather than enlarged to 2000. They have the same proportions as the other cinema images.
+- **Images:** WebP, quality 80. In the folders numbered from 0, `0.webp` is a grey placeholder graphic; baking, bread, buildings, friends, pasta and veggies start at `1.webp`. Pokémon images have transparent backgrounds. A few images are off their shape's usual size (cinema 2025×960 and 2000×959, three baking landscapes at 1200×801, one friends square at 1500×1500); `manifest.json` has the exact size of every file.
+- **Smaller cinema crops:** the cinema images in baking, bread, buildings, friends, pasta and veggies are center crops of their landscape images, kept at 1200 wide rather than enlarged to 2000. They have the same proportions as the other cinema images.
 - **Videos:** MP4 (H.264), each under 3 MB, set to start playing before the whole file downloads. The same `vid-N` is the same clip in all three shapes. Clips 3, 6 and 8 have no sound; the rest do.
-- **Total size:** about 100 MB.
+- **Total size:** about 110 MB.
 
 ## URLs
 
