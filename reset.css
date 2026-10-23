@@ -9,14 +9,14 @@
   /* html text styles */
 
   /* this set is little small in size, use for more conservative designs */
-  --h1: clamp(2rem, 1.3627rem + 2.6144vw, 4.5rem);
-  --h2: clamp(1.75rem, 1.1765rem + 2.3529vw, 4rem);
-  --h3: clamp(1.5rem, 0.9902rem + 2.0915vw, 3.5rem);
-  --h4: clamp(2rem, 1.7451rem + 1.0458vw, 3rem);
+  --h1: clamp(2.5rem, 1.8627rem + 2.6144vw, 5rem);
+  --h2: clamp(2rem, 1.3627rem + 2.6144vw, 4.5rem);
+  --h3: clamp(1.75rem, 1.1765rem + 2.3529vw, 4rem);
+  --h4: clamp(1.5rem, 0.9902rem + 2.0915vw, 3.5rem);
   --h5: clamp(1.25rem, 0.8039rem + 1.8301vw, 3rem);
-  --h6: clamp(1rem, 0.6814rem + 1.3072vw, 2.25rem);
-  --p-lg: clamp(1rem, 0.8725rem + 0.5229vw, 1.5rem);
-  --p: clamp(0.875rem, 0.7794rem + 0.3922vw, 1.25rem);
+  --h6: clamp(1rem, 0.6176rem + 1.5686vw, 2.5rem);
+  --p-lg: clamp(1rem, 0.7451rem + 1.0458vw, 2rem);
+  --p: clamp(0.875rem, 0.7157rem + 0.6536vw, 1.5rem);
   --p-sm: clamp(0.875rem, 0.8431rem + 0.1307vw, 1rem);
 
 
